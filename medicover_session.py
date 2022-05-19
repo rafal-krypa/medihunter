@@ -98,6 +98,16 @@ class MedicoverSession:
         soup = BeautifulSoup(page_text, "html.parser")
         return soup.form["action"]
 
+    def is_logged_in(self):
+        """Check whether we have valid session cookies"""
+
+        response = self.session.get(
+            "https://mol.medicover.pl/",
+            headers=self.headers,
+            allow_redirects=False)
+
+        return response.status_code == 200
+
     def log_in(self):
         """Login to Medicover website"""
         self.load_cookies()

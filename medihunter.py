@@ -167,6 +167,9 @@ def find_appointment(
     med_session.load_search_form()
 
     while interval > 0 or iteration_counter < 2:
+        if not med_session.is_logged_in():
+            med_session.log_in()
+
         appointments = []
         start_date_param = start_date
         for _ in range(days_ahead):
