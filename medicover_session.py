@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 
 import appdirs
 import requests
+import logging
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
@@ -28,7 +29,17 @@ class MedicoverSession:
     Creating (log_in) and killing (log_out) session.
     """
 
-    def __init__(self, username, password):
+    def __init__(self, username, password, debug=False):
+        if debug:
+            from http.client import HTTPConnection
+            HTTPConnection.debuglevel = 1
+
+            logging.basicConfig()
+            logging.getLogger().setLevel(logging.DEBUG)
+            requests_log = logging.getLogger("urllib3")
+            requests_log.setLevel(logging.DEBUG)
+            requests_log.propagate = True
+
         self.username = username
         self.password = password
         self.session = requests.Session()

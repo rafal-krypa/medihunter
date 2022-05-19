@@ -126,6 +126,7 @@ def validate_arguments(**kwargs) -> bool:
 @click.option("--user", prompt=True, envvar='MEDICOVER_USER')
 @click.password_option(confirmation_prompt=False, envvar='MEDICOVER_PASS')
 @click.option("--disable-phone-search", is_flag=True)
+@click.option("--debug", "-d", default=False, is_flag=True)
 def find_appointment(
     user,
     password,
@@ -144,6 +145,7 @@ def find_appointment(
     enable_notifier,
     notification_title,
     disable_phone_search,
+    debug,
 ):
 
     if end_date:
@@ -160,7 +162,7 @@ def find_appointment(
         return
 
     iteration_counter = 1
-    med_session = login(user, password)
+    med_session = login(user, password, debug)
     if not med_session:
         return
 
@@ -224,6 +226,7 @@ def find_appointment(
 @click.option("--clinic", "-c", type=int)
 @click.option("--user", prompt=True, envvar='MEDICOVER_USER')
 @click.password_option(confirmation_prompt=False, envvar='MEDICOVER_PASS')
+@click.option("--debug", "-d", default=False, is_flag=True)
 def show_params(
     field_name,
     region,
@@ -232,6 +235,7 @@ def show_params(
     clinic,
     user,
     password,
+    debug,
 ):
     get_params = None
     if field_name == "region":
@@ -255,7 +259,7 @@ def show_params(
             raise click.UsageError(f"Option --specialization is mandatory when --fild-name={field_name}")
         get_params = lambda: med_session.load_available_doctors(region, bookingtype, specialization, clinic)
 
-    med_session = login(user, password)
+    med_session = login(user, password, debug)
     if not med_session:
         return
     params = get_params()
@@ -269,8 +273,9 @@ def show_params(
 @click.command()
 @click.option("--user", prompt=True, envvar='MEDICOVER_USER')
 @click.password_option(confirmation_prompt=False, envvar='MEDICOVER_PASS')
-def my_plan(user, password):
-    med_session = login(user, password)
+@click.option("--debug", "-d", default=False, is_flag=True)
+def my_plan(user, password, debug):
+    med_session = login(user, password, debug)
     if not med_session:
         return
     plan = med_session.get_plan()
@@ -279,8 +284,8 @@ def my_plan(user, password):
         f.write(plan)
 
 
-def login(user, password):
-    med_session = MedicoverSession(username=user, password=password)
+def login(user, password, debug):
+    med_session = MedicoverSession(username=user, password=password, debug=debug)
     try:
         med_session.log_in()
     except Exception:
@@ -294,8 +299,9 @@ def login(user, password):
 @click.option("--show-past", default=False, is_flag=True, help='Also show past appointments')
 @click.option("--user", prompt=True, envvar='MEDICOVER_USER')
 @click.password_option(confirmation_prompt=False, envvar='MEDICOVER_PASS')
-def my_appointments(show_past, user, password):
-    med_session = login(user, password)
+@click.option("--debug", "-d", default=False, is_flag=True)
+def my_appointments(show_past, user, password, debug):
+    med_session = login(user, password, debug)
     if not med_session:
         return
     appointments = med_session.get_appointments(datetime.fromtimestamp(0) if show_past else now)
