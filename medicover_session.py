@@ -435,6 +435,15 @@ class MedicoverSession:
 
     def load_available_regions(self):
         """Download available region names and ids."""
+        response_json = self._get_initial_filters_data()
+        return response_json["regions"]
+
+    def load_available_booking_types(self):
+        """Download available service type names and ids."""
+        response_json = self._get_initial_filters_data()
+        return response_json["serviceTypes"]
+
+    def _get_initial_filters_data(self):
         response = self.session.get(
             BASE_URL + "/api/MyVisits/SearchFreeSlotsToBook/GetInitialFiltersData",
                 headers={
@@ -444,8 +453,7 @@ class MedicoverSession:
                 },
         )
         response.raise_for_status()
-        response_json = response.json()
-        return response_json["regions"]
+        return response.json()
 
     def load_available_specializations(self, region, bookingtype):
         """Download available specialization names and ids."""

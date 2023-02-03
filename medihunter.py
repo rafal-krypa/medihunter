@@ -217,7 +217,7 @@ def find_appointment(
 
 
 @click.command()
-@click.option("--field-name", "-f", type=click.Choice(["region", "specialization", "clinic", "doctor"]), required=True)
+@click.option("--field-name", "-f", type=click.Choice(["region", "bookingtype", "specialization", "clinic", "doctor"]), required=True)
 @click.option("--region", "-r", type=int)
 @click.option("--bookingtype", "-b", type=int, default=2, show_default=True)
 @click.option("--specialization", "-s", type=int)
@@ -236,6 +236,8 @@ def show_params(
     get_params = None
     if field_name == "region":
         get_params = lambda: med_session.load_available_regions()
+    if field_name == "bookingtype":
+        get_params = lambda: med_session.load_available_booking_types()
     elif field_name == "specialization":
         if not region:
             raise click.UsageError(f"Option --region is mandatory when --fild-name={field_name}")
